@@ -11,5 +11,12 @@
             "visibility": "public"
         }
     },
+    
+    "features": {
+        "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
+            "version": "latest",
+            "dockerDashComposeVersion": "latest"
+        }
+    },
     "postCreateCommand": "echo \"Email reg system ready.\""
 }
