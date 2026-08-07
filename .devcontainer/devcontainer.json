@@ -1,5 +1,5 @@
 {
-    "name": "Gear Out",
+    "name": "Email registration system",
     "dockerComposeFile": "../docker-compose.yml",
     "service": "web",
     "workspaceFolder": "/var/www/html",
