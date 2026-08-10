@@ -19,6 +19,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 // This assigned cookie data will modify sql_login, which runs afterwards.
 require("includes/sql_login.php");
-
 ?>
+<?php if ($invalid_login): ?>
+<?php elseif ($logged_in): ?>
+<?php require("mainpage.php"); ?>
+<?php else: ?>
+<?php require("try_to_log_in.php"); ?>
+<?php endif; ?>
 <?php require("includes/footer.php"); ?>
