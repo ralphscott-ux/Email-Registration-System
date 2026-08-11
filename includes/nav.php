@@ -9,10 +9,11 @@
         }
     }
 ?>
+<h1>Email Registration System for Businesses (for a school project)</h1>
 
 <nav>
     <?php
         echo_navitem("MainPage", "../index.php");
-        echo_navitem("SecondPage", "../index.php");
+        echo_navitem("ResetUserData", "../reset_user_data.php");
     ?>
 </nav>

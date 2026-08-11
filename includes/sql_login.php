@@ -18,7 +18,8 @@ $pdo = null; // global scope.
 try {
     $pdo = new PDO($dsn, $user, $pass, $options);
 } catch (PDOException $e) {
-    echo "FAILURE: " . $e->getMessage() . " CODE " . $e->getCode();
+    echo "SERVER FAILURE: " . $e->getMessage() . " CODE " . $e->getCode();
+    exit;
 }
 
 // Handle cookies
@@ -32,8 +33,7 @@ $following = null;
 $dateofbirth = null;
 $profile = null;
 
-if (!isset($invalid_login) || $invalid_login == false) {
-    $invalid_login = false;
+if (!$invalid_login) {
     if ($logged_in) {
         $mycookie = json_decode($_COOKIE["userdata"]);
         if (isset($mycookie["username"])
