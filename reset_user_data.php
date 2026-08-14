@@ -1,16 +1,34 @@
 <?php
-$pagetitlename = "ResetUserData";
+require("includes/begin_cookie.php");
+$posted = $_SERVER["REQUEST_METHOD"] == "POST";
 
 $invalid_login = false;
+$invalid_login_reason = "";
+$should_log_in = false;
+$should_sign_up = false;
+$invalid_password = false;
+$should_reset = $posted;
+require("includes/sql_login.php");
+$pagetitlename = "ResetUserData";
 
-$posted = $_SERVER["REQUEST_METHOD"] == "POST"; 
 if ($posted) {
-    setcookie("userdata", "", time() - 3600, "", "/");
+    try {
+        $stmt = $pdo->prepare("DELETE FROM emregtable WHERE password = ?");
+        $stmt->execute([ $password ]);
+    } catch (PDOException $e) {
+        $invalid_password = true;
+    }
+    $should_delete_cookies = true;
 }
+
+require("includes/end_cookie.php");
 require("includes/header.php");
 require("includes/nav.php");
 ?>
-<?php if ($posted): ?>
+<?php if ($invalid_password): ?>
+<h2>Invalid password found in cookies!</h2>
+Please, do not mess with your cookies.
+<?php elseif ($posted): ?>
 <h2>Success!</h2>
 User data has been deleted.
 <?php else: ?>

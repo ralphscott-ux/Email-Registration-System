@@ -1,8 +1,11 @@
 <?php
+require("includes/begin_cookie.php");
 
 $invalid_login = false;
+$invalid_login_reason = "";
 $should_log_in = false;
 $should_sign_up = false;
+$should_reset = false;
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (!isset($_POST["username"]) || !isset($_POST["password"])
@@ -10,44 +13,78 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         || !isset($_POST["dateofbirth"])
         || !isset($_POST["form_type"])) {
         $invalid_login = true;
+        $invalid_login_reason = "Incorrect post data.";
     } else {
         $should_log_in = true;
         switch ($_POST["form_type"]) {
             case "login": { $should_sign_up = false; break; }
             case "signup": { $should_sign_up = true; break; }
         }
-        $_COOKIE["userdata"] = json_encode([
+        $userdata = [
             "username" => $_POST["username"],
             "password" => base64_encode($_POST["password"]),
             "email" => $_POST["email"],
             "dateofbirth" => $_POST["dateofbirth"],
             "following" => json_encode([]),
             "profile" => 0,
-        ]);
-        setcookie("userdata", $_COOKIE["userdata"]);
+        ];
     };
 }
-require(__DIR__ . "/sql_login.php");
+require("includes/sql_login.php");
 
-require(__DIR__ . "/header.php");
-require(__DIR__ . "/nav.php");
 // This assigned cookie data will modify sql_login, which runs afterwards.\
+
+$ok_to_sign_up = true;
 if ($should_sign_up) {
-    // must be isset($_POST)
-    $stmt = $pdo->prepare(
-        "INSERT INTO emregtable
-            (`username`, `password`, `dob`, `email`, `following`, `profile`) VALUES (?, ?, ?, ?, ?, ?)"
-    );
-    $stmt->execute([ $_POST["username"], base64_encode($_POST["password"]), $_POST["dateofbirth"], $_POST["email"], json_encode([]), 0 ]);
+    // should have posted and therefore have inserted data
+    {
+        try {
+            $stmt = $pdo->prepare(
+                "SELECT * FROM emregtable
+                    WHERE username = ?"
+            );
+            $stmt->execute([ $_POST["username"] ]);
+            $ok_to_sign_up = is_null($stmt->fetch());
+        } catch (PDOException $ex) {
+            $invalid_login = true;
+            $invalid_login_reason = "User already exists";
+            $ok_to_sign_up = false; 
+        }
+    }
+    if ($ok_to_sign_up) {
+        // must be isset($_POST)
+        try {
+            $stmt = $pdo->prepare(
+                "INSERT INTO emregtable
+                    (`username`, `password`, `dob`, `email`, `following`, `profile`) VALUES (?, ?, ?, ?, ?, ?)"
+            );
+            $stmt->execute([ $userdata["username"], $userdata["password"], $userdata["dateofbirth"], $userdata["email"], $userdata["following"], $userdata["profile"] ]);
+        } catch (PDOException $ex) {
+            $invalid_login = true;
+            $invalid_login_reason = "Cannot insert user";
+        }
+    } else {
+        $should_delete_cookies = true;
+        $invalid_login = true;
+        $invalid_login_reason = "User already exists";
+    }
 }
+require("includes/end_cookie.php");
+
+require("includes/header.php");
+require("includes/nav.php");
 ?>
 <?php if ($invalid_login): ?>
 <h2>Login is invalid.</h2>
+<h3>Reason: <?php echo $invalid_login_reason; ?></h3>
 You may have tried to log in when not signed up, logged in with invalid credentials, or what have you.<br>
-<a href="<?php echo __DIR__ . "/../reset_user_data.php" ?>">Reset user data</a>
+<a href="<?php echo "reset_user_data.php" ?>">Reset user data</a>
 <?php elseif ($logged_in): ?>
-<?php require(__DIR__  . "/../" . $page_template); ?>
+<?php require($page_template); ?>
+<?php elseif (!$ok_to_sign_up): ?>
+<h2>Not ok to sign up when user <?php echo $userdata["username"]; ?> already exists.</h2>
+Try again.
 <?php else: ?>
-<?php require(__DIR__ . "/try_to_log_in.php"); ?>
+<?php require("includes/try_to_log_in.php"); ?>
 <?php endif; ?>
-<?php require(__DIR__ . "/footer.php"); ?>
+<?php require("includes/footer.php"); ?>
