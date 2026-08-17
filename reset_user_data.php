@@ -7,7 +7,6 @@ $invalid_login_reason = "";
 $should_log_in = true;
 $should_sign_up = false;
 $invalid_password = false;
-$should_reset = $posted;
 require("includes/sql_login.php");
 $pagetitlename = "ResetUserData";
 

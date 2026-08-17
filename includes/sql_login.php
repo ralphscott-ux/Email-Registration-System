@@ -1,11 +1,11 @@
 <?php
 require("includes/decode_date.php");
 
-$host = 'db';
-$dbname = 'emregsys';
-$user = 'root';
-$pass = 'EmailRegistration1234'; // Directly, written in
-$charset = 'utf8mb4';
+$host = "db";
+$dbname = "emregsys";
+$user = "root";
+$pass = "EmailRegistration1234"; // Directly, written in
+$charset = "utf8mb4";
 
 $dsn = "mysql:host=$host;dbname=$dbname;charset=$charset";
 
@@ -26,7 +26,7 @@ try {
 
 // Handle cookies
 
-$logged_in = !is_null($userdata) && !$should_reset;
+$logged_in = !is_null($userdata);
 
 $username = null;
 $password = null;
@@ -45,32 +45,32 @@ if (!$invalid_login) {
                 if ($should_sign_up) {
                     $stmt = $pdo->prepare("SELECT * FROM emregtable WHERE username = ? AND password = ?");
                     $stmt->execute([ $username, $password ]);
-                    $data = $stmt->fetch();
-                    if (!is_null($data) || data == true) {
+
+                    $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    
+                    if (!is_null($data) && count($data) > 0) {
                         $invalid_login = true;
                         $invalid_login_reason = "Could not sign up when user already exists.";
                     } else {
-                        $userdata = $data;
-                        $userdata["dateofbirth"] = decodeDate($userdata["dob"]);
                         $dateofbirth = $userdata["dateofbirth"];
-                        $profile = $data["profile"];
-                        $following = $data["following"];
-                        $email = $data["email"];
+                        $profile = $userdata["profile"];
+                        $following = $userdata["following"];
+                        $email = $userdata["email"];
                     }
                 } else {
                     $stmt = $pdo->prepare("SELECT * FROM emregtable WHERE username = ? AND password = ?");
                     $stmt->execute([ $username, $password ]);
-                    $data = $stmt->fetch();
-                    if (is_null($data) || $data == false) {
+                    $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    if (is_null($data) || $data == []) {
                         $invalid_login = true;
                         $invalid_login_reason = "User does not exist.";
                     } else {
-                        $userdata = $data;
+                        $userdata = $data[0];
                         $userdata["dateofbirth"] = $userdata["dob"];
                         $dateofbirth = decodeDate($userdata["dateofbirth"]);
-                        $profile = $data["profile"];
-                        $following = $data["following"];
-                        $email = $data["email"];
+                        $profile = $userdata["profile"];
+                        $following = $userdata["following"];
+                        $email = $userdata["email"];
                     }
                 }
             } catch (PDOException $ex) {

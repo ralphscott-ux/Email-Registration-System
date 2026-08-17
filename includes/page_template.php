@@ -5,7 +5,6 @@ $invalid_login = false;
 $invalid_login_reason = "";
 $should_log_in = false;
 $should_sign_up = false;
-$should_reset = false;
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (!isset($_POST["form_type"]) || (($_POST["form_type"] == "signup" || $_POST["form_type"] == "login")) &&
@@ -26,7 +25,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $should_log_in = true;
                 break;
             }
-            case "image": {
+            case "image":
+            case "profile_select": {
                 break;
             }
         }
@@ -56,7 +56,7 @@ if ($should_sign_up) {
                     WHERE username = ?"
             );
             $stmt->execute([ $_POST["username"] ]);
-            $fetch = $stmt->fetch();
+            $fetch = $stmt->fetchAll(PDO::FETCH_ASSOC);
             $ok_to_sign_up = is_null($fetch) || $fetch == false;
         } catch (PDOException $ex) {
             $invalid_login = true;

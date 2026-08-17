@@ -16,6 +16,7 @@
         echo_navitem("MainPage", "index.php");
         echo_navitem("About", "about_head.php");
         echo_navitem("ChangeProfile", "change_profile_head.php");
+        echo_navitem("FindUser", "find_user_head.php");
         echo_navitem("ResetUserData", "reset_user_data.php");
     ?>
 </nav>
