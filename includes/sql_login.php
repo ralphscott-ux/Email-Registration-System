@@ -38,43 +38,44 @@ $profile = null;
 if (!$invalid_login) {
     if ($logged_in) {
         if (isset($userdata["username"])
-            && isset($userdata["password"])
-            && isset($userdata["email"])
-            && isset($userdata["dateofbirth"])
-            && isset($userdata["profile"])
-            && isset($userdata["following"])) {
+            && isset($userdata["password"])) {
             $username = $userdata["username"];
             $password = $userdata["password"];
-            $dateofbirth = decodeDate($userdata["dateofbirth"]);
-            $profile = $userdata["profile"];
-            $following = $userdata["following"];
-            $email = $userdata["email"];
-
             try {
                 if ($should_sign_up) {
                     $stmt = $pdo->prepare("SELECT * FROM emregtable WHERE username = ? AND password = ?");
                     $stmt->execute([ $username, $password ]);
                     $data = $stmt->fetch();
-                    if (!is_null($data)) $invalid_login = true;
-                    else {
+                    if (!is_null($data) || data == true) {
+                        $invalid_login = true;
+                        $invalid_login_reason = "Could not sign up when user already exists.";
+                    } else {
                         $userdata = $data;
-                        $userdata["dateofbirth"] = $data["dob"];
+                        $userdata["dateofbirth"] = decodeDate($userdata["dob"]);
+                        $dateofbirth = $userdata["dateofbirth"];
+                        $profile = $data["profile"];
+                        $following = $data["following"];
+                        $email = $data["email"];
                     }
-                } else if ($should_log_in) {
+                } else {
                     $stmt = $pdo->prepare("SELECT * FROM emregtable WHERE username = ? AND password = ?");
                     $stmt->execute([ $username, $password ]);
                     $data = $stmt->fetch();
-                    if (is_null($data)) {
+                    if (is_null($data) || $data == false) {
                         $invalid_login = true;
                         $invalid_login_reason = "User does not exist.";
                     } else {
                         $userdata = $data;
-                        $userdata["dateofbirth"] = $data["dob"];
+                        $userdata["dateofbirth"] = $userdata["dob"];
+                        $dateofbirth = decodeDate($userdata["dateofbirth"]);
+                        $profile = $data["profile"];
+                        $following = $data["following"];
+                        $email = $data["email"];
                     }
                 }
             } catch (PDOException $ex) {
                 $invalid_login = true;
-                $invalid_login_reason = "Incorrect query";
+                $invalid_login_reason = "User does not exist";
             }
         } else {
             $invalid_login = true;

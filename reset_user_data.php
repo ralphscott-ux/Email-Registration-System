@@ -4,7 +4,7 @@ $posted = $_SERVER["REQUEST_METHOD"] == "POST";
 
 $invalid_login = false;
 $invalid_login_reason = "";
-$should_log_in = false;
+$should_log_in = true;
 $should_sign_up = false;
 $invalid_password = false;
 $should_reset = $posted;
@@ -13,8 +13,8 @@ $pagetitlename = "ResetUserData";
 
 if ($posted) {
     try {
-        $stmt = $pdo->prepare("DELETE FROM emregtable WHERE password = ?");
-        $stmt->execute([ $password ]);
+        $stmt = $pdo->prepare("DELETE FROM emregtable WHERE username = ? AND password = ?");
+        $stmt->execute([ $username, $password ]);
     } catch (PDOException $e) {
         $invalid_password = true;
     }

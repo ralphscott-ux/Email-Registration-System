@@ -1,10 +1,11 @@
 <?php
+    $image_array = [
+        "images/0.jpg",
+        "images/1.png"
+    ];
     function echo_image($id, $size) {
-        $image_array = [
-            "images/0.jpg",
-            "images/1.png"
-        ];
+        global $image_array;
         $file_path = $image_array[$id % count($image_array)];
-        echo "<img src=\"$file_path\" width=$size height=$size></img>";
+        echo "<input type=image name=$id src=\"$file_path\" width=$size height=$size></input>";
     }
 ?>

@@ -8,26 +8,38 @@ $should_sign_up = false;
 $should_reset = false;
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    if (!isset($_POST["username"]) || !isset($_POST["password"])
+    if (!isset($_POST["form_type"]) || (($_POST["form_type"] == "signup" || $_POST["form_type"] == "login")) &&
+        (!isset($_POST["username"]) || !isset($_POST["password"])
         || !isset($_POST["email"])
-        || !isset($_POST["dateofbirth"])
-        || !isset($_POST["form_type"])) {
+        || !isset($_POST["dateofbirth"]))) {
         $invalid_login = true;
         $invalid_login_reason = "Incorrect post data.";
     } else {
-        $should_log_in = true;
         switch ($_POST["form_type"]) {
-            case "login": { $should_sign_up = false; break; }
-            case "signup": { $should_sign_up = true; break; }
+            case "login": {
+                $should_sign_up = false;
+                $should_log_in = true;
+                break;
+            }
+            case "signup": {
+                $should_sign_up = true;
+                $should_log_in = true;
+                break;
+            }
+            case "image": {
+                break;
+            }
         }
-        $userdata = [
-            "username" => $_POST["username"],
-            "password" => base64_encode($_POST["password"]),
-            "email" => $_POST["email"],
-            "dateofbirth" => $_POST["dateofbirth"],
-            "following" => json_encode([]),
-            "profile" => 0,
-        ];
+        if ($_POST["form_type"] == "signup" || $_POST["form_type"] == "login") {
+            $userdata = [
+                "username" => $_POST["username"],
+                "password" => base64_encode($_POST["password"]),
+                "email" => $_POST["email"],
+                "dateofbirth" => $_POST["dateofbirth"],
+                "following" => json_encode([]),
+                "profile" => 0,
+            ];
+        }
     };
 }
 require("includes/sql_login.php");
@@ -44,7 +56,8 @@ if ($should_sign_up) {
                     WHERE username = ?"
             );
             $stmt->execute([ $_POST["username"] ]);
-            $ok_to_sign_up = is_null($stmt->fetch());
+            $fetch = $stmt->fetch();
+            $ok_to_sign_up = is_null($fetch) || $fetch == false;
         } catch (PDOException $ex) {
             $invalid_login = true;
             $invalid_login_reason = "User already exists";
