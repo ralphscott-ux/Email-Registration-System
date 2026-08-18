@@ -31,6 +31,7 @@ Please, do not mess with your cookies.
 <h2>Success!</h2>
 User data has been deleted.
 <?php else: ?>
+    <h3>Clicking on this button will reset your user data. If and only if logged in properly, it will also delete it.</h3>
 <form method="POST" action="reset_user_data.php">
     <button type="submit">Click this button to reset your user data.</button>
 </form> 

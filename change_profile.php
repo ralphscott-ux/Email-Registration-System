@@ -27,7 +27,7 @@
     <input type=hidden name=form_type value=image>
     <?php
         for ($i = 0; $i < count($image_array); $i += 1) {
-            echo_image($i, 200);
+            echo_image($i, 200, true);
         }
     ?>
 </form>

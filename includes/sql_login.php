@@ -52,7 +52,7 @@ if (!$invalid_login) {
                         $invalid_login = true;
                         $invalid_login_reason = "Could not sign up when user already exists.";
                     } else {
-                        $dateofbirth = $userdata["dateofbirth"];
+                        $dateofbirth = decodeDate($userdata["dateofbirth"]);
                         $profile = $userdata["profile"];
                         $following = $userdata["following"];
                         $email = $userdata["email"];

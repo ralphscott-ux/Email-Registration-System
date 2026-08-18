@@ -40,6 +40,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 "profile" => 0,
             ];
         }
+        $form_type = $_POST["form_type"];
     };
 }
 require("includes/sql_login.php");
@@ -83,7 +84,6 @@ if ($should_sign_up) {
     }
 }
 require("includes/end_cookie.php");
-
 require("includes/header.php");
 require("includes/nav.php");
 ?>
