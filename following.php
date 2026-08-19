@@ -9,7 +9,7 @@
     $stmt->execute([ $userdata["following"] ]);
     $fetch = $stmt->fetchAll(PDO::FETCH_ASSOC);
     foreach ($fetch as $row) {
-        $uname = $row["username"];
+        $uname = htmlspecialchars($row["username"]);
         echo "<li>";
         echo_image($row["profile"], 50);
         echo " " . htmlspecialchars($row["email"]);
